@@ -60,8 +60,6 @@ class WQCalendarMonthView: UIView {
         //注册cell
         let nib = UINib.init(nibName: cellId, bundle: Bundle.main)
         collectionView.register(nib, forCellWithReuseIdentifier: cellId)
-        
-        collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.never
     }
     
     override func layoutSubviews() {

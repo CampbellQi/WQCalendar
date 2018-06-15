@@ -9,24 +9,23 @@
 import UIKit
 
 class WQCalendarView: UIView {
-    let cellId = "WQCalendarCell"
-    let weekendHeight: CGFloat = 44 //周对应高度
+    private let cellId = "WQCalendarCell"
     
     //数据源
-    var sourceData: [[WQCalendarModel]] = []
+    private var sourceData: [[WQCalendarModel]] = []
     //日期区间数据
-    var timeRangeData: [TimeRangeModel]?
+    @objc var timeRangeData: [WQCalendarTimeRangeModel]?
     //当前所用日历
-    var currentCalendar: WQCalendar!
+    private var currentCalendar: WQCalendar!
     
     //选择日期回调
-    var selectedBlock: ((_ date: Date) -> Void)?
+    @objc var selectedBlock: ((_ date: Date) -> Void)?
     
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var currentDateLbl: UILabel!
     
     //定义flowlayout
-    var layout: UICollectionViewFlowLayout! {
+    private var layout: UICollectionViewFlowLayout! {
         let layout = UICollectionViewFlowLayout.init()
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
@@ -36,7 +35,7 @@ class WQCalendarView: UIView {
         return layout
     }
     
-    override init(frame: CGRect) {
+    @objc override init(frame: CGRect) {
         super.init(frame: frame)
         self.commonInit()
     }

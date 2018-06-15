@@ -19,27 +19,29 @@ class CalendarControllerController: UIViewController {
                     ["start": "2018-5-2", "end": "2018-5-29", "status": "1"]]
         
         
-        var timeRange: [TimeRangeModel] = []
+        var timeRange: [WQCalendarTimeRangeModel] = []
         for item in dict {
-            let trm = TimeRangeModel()
+            let trm = WQCalendarTimeRangeModel()
             let startDate = WQCalendar.dateFromStr(date: "\(item["start"]!) 12:00:00", format: WQCalendar.TIME)
-            trm.startDay = Int(WQCalendar.dateToStr(date: startDate, format: "dd"))
-            trm.startMonth = Int(WQCalendar.dateToStr(date: startDate, format: "MM"))
-            trm.startYear = Int(WQCalendar.dateToStr(date: startDate, format: "yyyy"))
+            trm.startDay = Int(WQCalendar.dateToStr(date: startDate, format: "dd"))!
+            trm.startMonth = Int(WQCalendar.dateToStr(date: startDate, format: "MM"))!
+            trm.startYear = Int(WQCalendar.dateToStr(date: startDate, format: "yyyy"))!
             
             let endDate = WQCalendar.dateFromStr(date: "\(item["end"]!) 12:00:00", format: WQCalendar.TIME)
-            trm.endDay = Int(WQCalendar.dateToStr(date: endDate, format: "dd"))
-            trm.endMonth = Int(WQCalendar.dateToStr(date: endDate, format: "MM"))
-            trm.endYear = Int(WQCalendar.dateToStr(date: endDate, format: "yyyy"))
+            trm.endDay = Int(WQCalendar.dateToStr(date: endDate, format: "dd"))!
+            trm.endMonth = Int(WQCalendar.dateToStr(date: endDate, format: "MM"))!
+            trm.endYear = Int(WQCalendar.dateToStr(date: endDate, format: "yyyy"))!
             
-            trm.status = item["status"]
+            trm.status = item["status"]!
             
             timeRange.append(trm)
         }
+        
+        
         let mainSize = UIScreen.main.bounds.size
         let view  = WQCalendarView.init(frame: CGRect.init(x: 0, y: 0, width: mainSize.width - 22 * 2, height: 366))
         view.timeRangeData = timeRange
-        view.layer.cornerRadius = 5.0
+        
         view.selectedBlock = {date in
             print("date = \(date)")
             self.dismiss(animated: false, completion: nil)
@@ -66,16 +68,4 @@ class CalendarControllerController: UIViewController {
     }
     */
 
-}
-
-class TimeRangeModel: NSObject {
-    var startDay: Int!
-    var startMonth: Int!
-    var startYear: Int!
-    
-    var endDay: Int!
-    var endMonth: Int!
-    var endYear: Int!
-    
-    var status: String!
 }
