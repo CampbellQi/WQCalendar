@@ -12,7 +12,11 @@ class WQCalendarView: UIView {
     let cellId = "WQCalendarCell"
     let weekendHeight: CGFloat = 44 //周对应高度
     
-    var sourceData: [[WQCalendarModel]] = [] //数据源
+    //数据源
+    var sourceData: [[WQCalendarModel]] = []
+    //日期区间数据
+    var timeRangeData: [TimeRangeModel]?
+    //当前所用日历
     var currentCalendar: WQCalendar!
     
     //选择日期回调
@@ -55,16 +59,12 @@ class WQCalendarView: UIView {
         
         self.currentCalendar = WQCalendar.init(currentDate: Date())
         
-        self.setUpData()
+//        self.setUpData()
         
-        self.collectionView.scrollToItem(at: IndexPath.init(row: 1, section: 0), at: UICollectionViewScrollPosition.left, animated: false)
         
-        collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.never
     }
     
-    private func setUpData() {
-        
-        
+    func setUpData() {
         self.currentDateLbl.text = "\(self.currentCalendar.year!)年\(self.currentCalendar.month!)月"
         
         let currentMonthData = self.getMonthData(calendar: self.currentCalendar)
@@ -73,6 +73,8 @@ class WQCalendarView: UIView {
         
         self.sourceData = [lastMonthData ,currentMonthData, nextMonthData]
         self.collectionView.reloadData()
+        
+        self.collectionView.scrollToItem(at: IndexPath.init(row: 1, section: 0), at: UICollectionViewScrollPosition.left, animated: false)
     }
     
     //根据月份时间获取数据
@@ -87,6 +89,8 @@ class WQCalendarView: UIView {
             model.day = i
             model.year = calendar.year
             model.month = calendar.month
+            
+            self.setModelStatus(model: model)
             currentMonthData.append(model)
         }
         
@@ -99,6 +103,8 @@ class WQCalendarView: UIView {
             model.day = i
             model.year = lastCalendar.year
             model.month = lastCalendar.month
+            
+            self.setModelStatus(model: model)
             lastMonthData.append(model)
         }
         
@@ -114,6 +120,8 @@ class WQCalendarView: UIView {
                 model.day = i + 1
                 model.month = nextCalendar.month
                 model.year = nextCalendar.year
+                
+                self.setModelStatus(model: model)
                 nextMonthData.append(model)
             }
         }
@@ -127,6 +135,16 @@ class WQCalendarView: UIView {
         
     }
 
+    func setModelStatus(model cm: WQCalendarModel) {
+        if let _ = timeRangeData {
+            for trm in timeRangeData! {
+                if (cm.year>=trm.startYear && cm.month>=trm.startMonth && cm.day>=trm.startDay) && (cm.year<=trm.endYear && cm.month<=trm.endMonth && cm.day<=trm.endDay) {
+                    cm.status = trm.status
+                    break
+                }
+            }
+        }
+    }
     
 
 }
@@ -148,7 +166,7 @@ extension WQCalendarView: UICollectionViewDelegate, UICollectionViewDataSource {
         
         let index = scrollView.contentOffset.x / scrollView.frame.width
         if index == 2 || index == 0 {
-            self.collectionView.scrollToItem(at: IndexPath.init(row: 1, section: 0), at: UICollectionViewScrollPosition.left, animated: false)
+//            self.collectionView.scrollToItem(at: IndexPath.init(row: 1, section: 0), at: UICollectionViewScrollPosition.left, animated: false)
             if index == 2 {
                 self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.nextMonth)
             }else if index == 0 {

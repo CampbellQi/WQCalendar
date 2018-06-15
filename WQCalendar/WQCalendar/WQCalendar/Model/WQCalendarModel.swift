@@ -12,4 +12,6 @@ class WQCalendarModel: NSObject {
     var day: Int!
     var year: Int!
     var month: Int!
+    
+    var status: String = "可预约"
 }
