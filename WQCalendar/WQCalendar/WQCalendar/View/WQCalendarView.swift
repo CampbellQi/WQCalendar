@@ -21,11 +21,12 @@ class WQCalendarView: UIView {
     //选择日期回调
     @objc var selectedBlock: ((_ date: Date) -> Void)?
     
+    @IBOutlet weak var leftBtn: UIButton!
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var currentDateLbl: UILabel!
     
     @IBAction func nextMonthAction(_ sender: Any) {
-        self.collectionView.scrollToItem(at: IndexPath.init(row: 2, section: 0), at: UICollectionViewScrollPosition.left, animated: true)
+        self.collectionView.scrollToItem(at: IndexPath.init(row: self.sourceData.count-1, section: 0), at: UICollectionViewScrollPosition.left, animated: true)
         
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+0.3) {
             self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.nextMonth)
@@ -35,11 +36,13 @@ class WQCalendarView: UIView {
         
     }
     @IBAction func lastMonthAction(_ sender: Any) {
-        self.collectionView.scrollToItem(at: IndexPath.init(row: 0, section: 0), at: UICollectionViewScrollPosition.left, animated: true)
-        
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+0.3) {
-            self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.lastMonth)
-            self.setUpData()
+        if self.sourceData.count > 2 {
+            self.collectionView.scrollToItem(at: IndexPath.init(row: 0, section: 0), at: UICollectionViewScrollPosition.left, animated: true)
+            
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+0.3) {
+                self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.lastMonth)
+                self.setUpData()
+            }
         }
     }
     //定义flowlayout
@@ -75,23 +78,29 @@ class WQCalendarView: UIView {
         self.collectionView.setCollectionViewLayout(self.layout, animated: false)
         
         self.currentCalendar = WQCalendar.init(currentDate: Date())
-        
-//        self.setUpData()
-        
-        
     }
     
-    func setUpData() {
+    @objc func setUpData() {
         self.currentDateLbl.text = "\(self.currentCalendar.year!)年\(self.currentCalendar.month!)月"
         
         let currentMonthData = self.getMonthData(calendar: self.currentCalendar)
-        let lastMonthData = self.getMonthData(calendar: WQCalendar.init(currentDate: self.currentCalendar.lastMonth))
         let nextMonthData = self.getMonthData(calendar: WQCalendar.init(currentDate: self.currentCalendar.nextMonth))
         
-        self.sourceData = [lastMonthData ,currentMonthData, nextMonthData]
-        self.collectionView.reloadData()
-        
-        self.collectionView.scrollToItem(at: IndexPath.init(row: 1, section: 0), at: UICollectionViewScrollPosition.left, animated: false)
+        let nowCalendar = WQCalendar.init(currentDate: Date())
+        if currentCalendar.year == nowCalendar.year && currentCalendar.month == nowCalendar.month {
+            self.sourceData = [currentMonthData, nextMonthData]
+            self.collectionView.reloadData()
+            
+            self.leftBtn.isSelected = true
+        }else {
+            let lastMonthData = self.getMonthData(calendar: WQCalendar.init(currentDate: self.currentCalendar.lastMonth))
+            self.sourceData = [lastMonthData ,currentMonthData, nextMonthData]
+            self.collectionView.reloadData()
+            
+            self.collectionView.scrollToItem(at: IndexPath.init(row: 1, section: 0), at: UICollectionViewScrollPosition.left, animated: false)
+            
+            self.leftBtn.isSelected = false
+        }
     }
     
     //根据月份时间获取数据
@@ -155,8 +164,11 @@ class WQCalendarView: UIView {
 
     func setModelStatus(model cm: WQCalendarModel) {
         if let _ = timeRangeData {
+            let date = WQCalendar.dateFromStr(date: "\(cm.year!)-\(cm.month!)-\(cm.day!) 12:00:00", format: WQCalendar.TIME).timeIntervalSince1970
             for trm in timeRangeData! {
-                if (cm.year>=trm.startYear && cm.month>=trm.startMonth && cm.day>=trm.startDay) && (cm.year<=trm.endYear && cm.month<=trm.endMonth && cm.day<=trm.endDay) {
+                let startDate = WQCalendar.dateFromStr(date: "\(trm.startYear)-\(trm.startMonth)-\(trm.startDay) 12:00:00", format: WQCalendar.TIME).timeIntervalSince1970
+                let endDate = WQCalendar.dateFromStr(date: "\(trm.endYear)-\(trm.endMonth)-\(trm.endDay) 12:00:00", format: WQCalendar.TIME).timeIntervalSince1970
+                if (date >= startDate && date <= endDate)  {
                     cm.status = trm.status
                     break
                 }
@@ -179,19 +191,27 @@ extension WQCalendarView: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.sourceData.count
     }
-    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        scrollView.isUserInteractionEnabled = false
+    }
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        scrollView.isUserInteractionEnabled = true
         
         let index = scrollView.contentOffset.x / scrollView.frame.width
-        if index == 2 || index == 0 {
-//            self.collectionView.scrollToItem(at: IndexPath.init(row: 1, section: 0), at: UICollectionViewScrollPosition.left, animated: false)
-            if index == 2 {
-                self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.nextMonth)
-            }else if index == 0 {
+        
+        if index == 2 {
+            self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.nextMonth)
+        }else if index == 0{
+            if self.sourceData.count > 2 {
                 self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.lastMonth)
             }
-            
-            self.setUpData()
+        }else if index == 1 {
+            if self.sourceData.count < 3 {
+                self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.nextMonth)
+            }
         }
+        
+        self.setUpData()
+        
     }
 }

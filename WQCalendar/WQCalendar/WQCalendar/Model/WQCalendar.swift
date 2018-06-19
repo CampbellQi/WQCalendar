@@ -74,12 +74,12 @@ class WQCalendar: NSObject {
 
 extension WQCalendar {
     //时间转字符串
-    class func dateToStr(date: Date, format: String) -> String {
+    @objc class func dateToStr(date: Date, format: String) -> String {
         WQCalendar.dateFormater.dateFormat = format
         return WQCalendar.dateFormater.string(from: date)
     }
     //字符串转时间转时间
-    class func dateFromStr(date: String, format: String) -> Date {
+    @objc class func dateFromStr(date: String, format: String) -> Date {
         WQCalendar.dateFormater.dateFormat = format
         return WQCalendar.dateFormater.date(from: date)!
     }
