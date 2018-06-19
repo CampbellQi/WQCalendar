@@ -16,8 +16,10 @@ class WQCalendarDayCell: UICollectionViewCell {
     var sourceModel: WQCalendarModel! {
         didSet {
             if let _ = sourceModel {
+                //日子
                 contentLbl.text = "\(sourceModel.day!)"
                 
+                //根据状态颜色设置
                 var status = "可预约"
                 var color = UIColor.init(red: 49/255.0, green: 194/255.0, blue: 124/255.0, alpha: 1)
                 switch Int(sourceModel.status) {
@@ -35,6 +37,13 @@ class WQCalendarDayCell: UICollectionViewCell {
                 
                 descLbl.textColor = color
                 descLbl.text = status
+                
+                //非本月日子设置颜色区分
+                var contentColor = UIColor.init(red: 51/255.0, green: 51/255.0, blue: 51/255.0, alpha: 1)
+                if sourceModel.isCurrentMonth == false {
+                    contentColor = UIColor.init(red: 153/255.0, green: 153/255.0, blue: 153/255.0, alpha: 1)
+                }
+                self.contentLbl.textColor = contentColor
             }
         }
     }

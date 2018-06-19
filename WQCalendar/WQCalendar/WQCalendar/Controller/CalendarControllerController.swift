@@ -39,7 +39,7 @@ class CalendarControllerController: UIViewController {
         
         
         let mainSize = UIScreen.main.bounds.size
-        let view  = WQCalendarView.init(frame: CGRect.init(x: 0, y: 0, width: mainSize.width - 22 * 2, height: 366))
+        let view  = WQCalendarView.init(frame: CGRect.init(x: 0, y: 0, width: mainSize.width - 22 * 2, height: 325))
         view.timeRangeData = timeRange
         
         view.selectedBlock = {date in

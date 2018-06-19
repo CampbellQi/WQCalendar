@@ -24,6 +24,24 @@ class WQCalendarView: UIView {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var currentDateLbl: UILabel!
     
+    @IBAction func nextMonthAction(_ sender: Any) {
+        self.collectionView.scrollToItem(at: IndexPath.init(row: 2, section: 0), at: UICollectionViewScrollPosition.left, animated: true)
+        
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+0.3) {
+            self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.nextMonth)
+            self.setUpData()
+        }
+        
+        
+    }
+    @IBAction func lastMonthAction(_ sender: Any) {
+        self.collectionView.scrollToItem(at: IndexPath.init(row: 0, section: 0), at: UICollectionViewScrollPosition.left, animated: true)
+        
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+0.3) {
+            self.currentCalendar = WQCalendar.init(currentDate: self.currentCalendar.lastMonth)
+            self.setUpData()
+        }
+    }
     //定义flowlayout
     private var layout: UICollectionViewFlowLayout! {
         let layout = UICollectionViewFlowLayout.init()
@@ -31,7 +49,7 @@ class WQCalendarView: UIView {
         layout.minimumInteritemSpacing = 0
         layout.scrollDirection = UICollectionViewScrollDirection.horizontal
 //        layout.sectionInset = UIEdgeInsetsMake(0, 0, 0, 0)
-        layout.itemSize = CGSize.init(width: self.collectionView.frame.width, height: self.collectionView.frame.height-20)
+        layout.itemSize = CGSize.init(width: self.collectionView.frame.width, height: self.collectionView.frame.height)
         return layout
     }
     
@@ -88,7 +106,6 @@ class WQCalendarView: UIView {
             model.day = i
             model.year = calendar.year
             model.month = calendar.month
-            
             self.setModelStatus(model: model)
             currentMonthData.append(model)
         }
@@ -102,6 +119,7 @@ class WQCalendarView: UIView {
             model.day = i
             model.year = lastCalendar.year
             model.month = lastCalendar.month
+            model.isCurrentMonth = false
             
             self.setModelStatus(model: model)
             lastMonthData.append(model)
@@ -119,6 +137,7 @@ class WQCalendarView: UIView {
                 model.day = i + 1
                 model.month = nextCalendar.month
                 model.year = nextCalendar.year
+                model.isCurrentMonth = false
                 
                 self.setModelStatus(model: model)
                 nextMonthData.append(model)

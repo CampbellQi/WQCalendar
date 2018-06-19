@@ -14,4 +14,5 @@ class WQCalendarModel: NSObject {
     var month: Int!
     
     var status: String = "可预约"
+    var isCurrentMonth = true //是否是当月日子
 }
